@@ -10,11 +10,11 @@ import (
 
 var channel, username, slackpath, text, emoji string
 func init() {
-	flag.StringVar(&slackpath, "slackpath", "",            "the path of the slack webhook")
-	flag.StringVar(&text,      "text",      "",            "the message to post")
-	flag.StringVar(&channel,   "channel",   "#general",    "the channel to post to")
-	flag.StringVar(&username,  "username",  "goslackgo",   "the username")
-	flag.StringVar(&emoji,     "emoji",     "poop",            "the empoji icon code without the colons")
+	flag.StringVar(&slackpath, "slackpath", "",          "the path of the slack webhook")
+	flag.StringVar(&text,      "text",      "",          "the message to post")
+	flag.StringVar(&channel,   "channel",   "#general",  "the channel to post to")
+	flag.StringVar(&username,  "username",  "goslackgo", "the username")
+	flag.StringVar(&emoji,     "emoji",     "poop",      "the empoji icon code without the colons")
 }
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 	request := gorequest.New()
 	_, body, err := request.Post(fmt.Sprintf("https://hooks.slack.com/services/%s", slackpath)).
   	Set("User-Agent", "packethost/goslack").
-	  Send(`{"channel":"`+ channel +`", "username":"` + username + `", "text":"`+ text +`", "icon_emoji":":`+ emoji +`:"}`).
+		Send(`{"channel":"`+ channel +`", "username":"` + username + `", "text":"`+ text +`", "icon_emoji":":`+ emoji +`:"}`).
   	End(printStatus)
 
 	if err != nil {
@@ -43,5 +43,5 @@ func main() {
 }
 
 func printStatus(resp gorequest.Response, body string, errs []error){
-  fmt.Println(resp.Status)
+	fmt.Println(resp.Status)
 }
