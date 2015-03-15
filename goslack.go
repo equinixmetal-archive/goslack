@@ -31,9 +31,9 @@ func main() {
 
 	request := gorequest.New()
 	_, body, err := request.Post(fmt.Sprintf("https://hooks.slack.com/services/%s", slackpath)).
-  	Set("User-Agent", "packethost/goslack").
-		Send(`{"channel":"`+ channel +`", "username":"` + username + `", "text":"`+ text +`", "icon_emoji":":`+ emoji +`:"}`).
-  	End(printStatus)
+	Set("User-Agent", "packethost/goslack").
+	Send(`{"channel":"`+ channel +`", "username":"` + username + `", "text":"`+ text +`", "icon_emoji":":`+ emoji +`:"}`).
+	End(printStatus)
 
 	if err != nil {
 		fmt.Sprintf("Error: %v", err)
