@@ -1,6 +1,8 @@
-# Dockerfile for a Rails application using Unicorn
+# Dockerfile for running goslack
 FROM packethost/baseimage
 MAINTAINER Aaron Welch "welch@packet.net"
+
+ADD goslack /usr/local/bin/
 
 USER root
 # Install goslack deps
@@ -9,4 +11,4 @@ RUN \
 	apt-get install -qy \
 		golang
 
-USER root
+CMD goslack -slackpath="$SLACK_PATH" -text="$SLACK_TEXT" -channel=$SLACK_CHANNEL -username="$SLACK_USERNAME" -emoji=$SLACK_EMOJI
