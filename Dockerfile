@@ -1,5 +1,5 @@
 # Dockerfile for running goslack
-FROM packethost/baseimage
+FROM quay.io/packet/baseimage
 MAINTAINER Aaron Welch "welch@packet.net"
 
 ADD goslack /usr/local/bin/
