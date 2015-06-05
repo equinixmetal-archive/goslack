@@ -3,10 +3,13 @@ package main
 import (
 	"os"
 	"fmt"
+	"net"
 	"flag"
+	"time"
 
 	"github.com/bsphere/le_go"
 	"github.com/parnurzeal/gorequest"
+	"github.com/tatsushid/go-fastping"
 )
 
 var slackpath, letoken, text, channel, username, emoji string
@@ -20,18 +23,19 @@ func init() {
 }
 
 func main() {
+
 	flag.Parse()
 
 	if slackpath == "" {
-		fmt.Printf("please provide the -slackpath parameter\n")
+		fmt.Println("please provide the -slackpath parameter")
 		os.Exit(1)
 	}
 	if letoken == "" {
-		fmt.Printf("please provide the -letoken parameter\n")
+		fmt.Println("please provide the -letoken parameter")
 		os.Exit(1)
 	}
 	if text == "" {
-		fmt.Printf("please provide the -text parameter\n")
+		fmt.Println("please provide the -text parameter")
 		os.Exit(1)
 	}
 
@@ -43,15 +47,45 @@ func main() {
 	le.Println(text)
 
 	request := gorequest.New()
-	_, body, err := request.Post(fmt.Sprintf("https://hooks.slack.com/services/%s", slackpath)).
+	_, _, err := request.Post(fmt.Sprintf("https://hooks.slack.com/services/%s", slackpath)).
 	Set("User-Agent", "packethost/goslack").
 	Send(`{"channel":"`+ channel +`", "username":"` + username + `", "text":"`+ text +`", "icon_emoji":":`+ emoji +`:"}`).
 	End(printStatus)
 
 	if err != nil {
-		fmt.Sprintf("Error: %v", err)
-	}	else {
-		fmt.Println(body)
+		le.Printf("slack ping failed: %v", err)
+	}
+
+	p := fastping.NewPinger()
+
+	v4, e := net.ResolveIPAddr("ip4:icmp", "147.75.192.73")
+	if e == nil {
+		p.AddIPAddr(v4)
+	} else {
+		le.Printf("ip4 147.75.192.73 error: %s", e)
+	}
+
+	v4priv, e := net.ResolveIPAddr("ip4:icmp", "10.100.0.73")
+	if e == nil {
+		p.AddIPAddr(v4priv)
+	} else {
+		le.Printf("ip4 10.100.0.73 ping error: %s", e)
+	}
+
+	v6, e := net.ResolveIPAddr("ip6:icmp", "2604:1380::49")
+	if e == nil {
+		p.AddIPAddr(v6)
+	} else {
+		le.Printf("ip6 2604:1380::49 error: %s", e)
+	}
+
+	p.OnRecv = func(addr *net.IPAddr, rtt time.Duration) {
+		le.Printf("ping success: %s receive, RTT: %v\n", addr.String(), rtt)
+	}
+
+	e = p.Run()
+	if e != nil {
+		le.Printf("ping test error: %s", e)
 	}
 }
 
